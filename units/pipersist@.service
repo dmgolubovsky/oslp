@@ -1,0 +1,13 @@
+[Unit]
+Description=Provide a persistent pipe
+ConditionPathExists=!/tmp/%i
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/mkfifo /tmp/%i
+ExecStart=sh -c "/bin/sleep inf >/tmp/%i"
+ExecStop=/bin/rm /tmp/%i
+
+[Install]
+
+

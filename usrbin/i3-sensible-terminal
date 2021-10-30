@@ -1,0 +1,4 @@
+#! /bin/sh
+
+xterm -fa "DejavuSansMono:size=12" -maximized -fg lightgray -bg black -ti vt340 "$@"
+

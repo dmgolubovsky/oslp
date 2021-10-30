@@ -1,0 +1,23 @@
+#! /bin/sh
+
+# $1: JSON directory
+# $2: JSON file to process
+# $3: if non-blank jack_disconnect will be run, otherwise jack_connect
+
+[ -z "$2" ] && exit
+
+dis="$3"
+
+[ ! -z "$dis" ] && dis="dis"
+
+# Connections are in the second level object named "connect".
+# Keys are synthesizer's audio/midi ports
+# Values are selectors for the connection points specified as if all JSON
+# files from the directory $1 are slurped.
+
+jq '.[].connect|select(. != null)' "$1/$2" | sed 's/[\{\}\,]//g' | grep -v '^$' | while read kv ; do
+  k=`echo '{'"$kv"'}'| jq 'keys[0]' | tr -d '"'`
+  v=`echo '{'"$kv"'}'| jq '.[]' | tr -d '"'`
+  vv=`jq "$v|select(. != null)"  --slurp $1/*.json | tr -d '"'`
+  jack_${dis}connect "$k" "$vv"
+done

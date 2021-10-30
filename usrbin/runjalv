@@ -1,0 +1,39 @@
+#! /bin/bash
+
+# Run JALV for the given synth.
+
+# $1: JSON directory
+# $2: JSON file to process
+
+[ -z "$2" ] && exit
+
+uri=`jq '.[].uri|select(. != null)' "$1/$2" | tr -d '"'`
+
+altcl=`basename json/zyn.json '.json'`
+
+client=`jq '.[].client|select(. != null)' "$1/$2" | tr -d '"'`
+
+gui=`jq '.[].gui|select(. != null)' "$1/$2"`
+
+guifl=""
+jalvx=""
+
+[ ! -z "$DISPLAY" ] && {
+	guifl="-s"
+	jalvx=".gtk3"
+} || {
+	guifl="-o"
+}
+
+[ -z "$uri" ] && { 
+	echo "Plugin URI not specified"
+	exit 1
+}
+
+[ -z "$client" ] && { 
+	echo "JACK client name not specified"
+	exit 1
+}
+
+jalv${jalvx} $guifl -n "$client" -x "$uri" < "/tmp/${client}.in" > /dev/null
+

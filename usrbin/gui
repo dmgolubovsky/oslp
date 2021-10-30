@@ -1,0 +1,22 @@
+#! /bin/bash
+
+gmon=`systemctl show-environment | grep 'DISPLAY=:' | wc -l`
+
+[ -z "$1" ] && {
+	[ $gmon -eq 1 ] && echo "gui mode on" || echo "gui mode off"
+	exit
+}
+
+xa="$XAUTHORITY"
+
+[ -z "$xa" ] && xa=`xauth info | grep "^Authority file:"|cut -d: -f 2|sed -e 's/^ *//'`
+
+[ "$1" = "on" ] && {
+	systemctl set-environment DISPLAY="$DISPLAY"
+	systemctl set-environment XAUTHORITY="$xa"
+} || {
+	systemctl unset-environment DISPLAY
+	systemctl unset-environment XAUTHORITY
+}
+
+

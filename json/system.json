@@ -1,0 +1,9 @@
+{
+	"system": {
+		"description": "Jack audio inputs/outputs",
+		"mic_L": "system:capture_1",
+		"mic_R": "system:capture_2",
+		"out_L": "system:playback_1",
+		"out_R": "system:playback_2"
+	}
+}

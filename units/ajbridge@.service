@@ -1,0 +1,7 @@
+[Unit]
+Description=Run a2jmidi_bridge on the given port
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/a2jmidi_bridge "%I"
+

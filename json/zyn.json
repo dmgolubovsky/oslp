@@ -1,0 +1,12 @@
+{
+	"zyn": {
+		"uri": "http://zynaddsubfx.sourceforge.net",
+		"description": "ZynAddSubFX direct",
+		"client": "zyn",
+		"connect": {
+			"zyn:lv2_events_in": ".[].apro.midi_out",
+			"zyn:lv2_audio_out_1": ".[].system.out_L",
+			"zyn:lv2_audio_out_2": ".[].system.out_R"
+		}
+	}
+}

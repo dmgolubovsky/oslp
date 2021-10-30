@@ -1,0 +1,7 @@
+{
+	"apro": {
+		"description": "Roland A-300",
+		"midi_out": "a2j:A-PRO (capture): A-PRO 1",
+		"midi_ctl": "a2j:A-PRO (capture): A-PRO 2"
+	}
+}

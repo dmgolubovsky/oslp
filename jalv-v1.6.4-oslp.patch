@@ -1,0 +1,84 @@
+diff --git a/src/jalv_console.c b/src/jalv_console.c
+index 7d11714..eac2bd0 100644
+--- a/src/jalv_console.c
++++ b/src/jalv_console.c
+@@ -46,6 +46,7 @@ print_usage(const char* name, bool error)
+ 	fprintf(os, "  -t           Print trace messages from plugin\n");
+ 	fprintf(os, "  -u UUID      UUID for Jack session restoration\n");
+ 	fprintf(os, "  -x           Exact JACK client name (exit if taken)\n");
++	fprintf(os, "  -o           OSLP mode: write controls and monitors to external files\n");
+ 	return error ? 1 : 0;
+ }
+ 
+@@ -103,6 +104,8 @@ jalv_init(int* argc, char*** argv, JalvOptions* opts)
+ 			opts->dump = true;
+ 		} else if ((*argv)[a][1] == 't') {
+ 			opts->trace = true;
++		} else if ((*argv)[a][1] == 'o') {
++			opts->oslp_mode = true;
+ 		} else if ((*argv)[a][1] == 'n') {
+ 			if (++a == *argc) {
+ 				fprintf(stderr, "Missing argument for -n\n");
+@@ -127,9 +130,20 @@ jalv_native_ui_type(void)
+ 	return NULL;
+ }
+ 
++// In the OSLP mode, settings of controls and monitors are written
++// to external files /tmp/<client>.controls or /tmp/<client>.monitors
++// instead of standard output.
++
+ static void
+ jalv_print_controls(Jalv* jalv, bool writable, bool readable)
+ {
++	char *extfnb = writable ? "controls" : "monitors";
++	FILE *extfl = NULL;
++	if (jalv->opts.oslp_mode) {
++		char extfn[200];
++		snprintf (extfn, 199, "/tmp/%s.%s", jalv->opts.name, extfnb);
++		extfl = fopen (extfn, "w");
++	}
+ 	for (size_t i = 0; i < jalv->controls.n_controls; ++i) {
+ 		ControlID* const control = jalv->controls.controls[i];
+ 		if ((control->is_writable && writable) ||
+@@ -138,8 +152,16 @@ jalv_print_controls(Jalv* jalv, bool writable, bool readable)
+ 			printf("%s = %f\n",
+ 			       lilv_node_as_string(control->symbol),
+ 			       port->control);
++			if (extfl != NULL) {
++				fprintf(extfl, "%s = %f\n",
++				       lilv_node_as_string(control->symbol),
++				       port->control);
++			}
+ 		}
+ 	}
++	if (jalv->opts.oslp_mode && extfl != NULL) {
++		fclose (extfl);
++	}
+ }
+ 
+ static int
+diff --git a/src/jalv_gtk.c b/src/jalv_gtk.c
+index 71259bd..6c1b0cd 100644
+--- a/src/jalv_gtk.c
++++ b/src/jalv_gtk.c
+@@ -101,7 +101,7 @@ jalv_init(int* argc, char*** argv, JalvOptions* opts)
+ 		  "Print trace messages from plugin", NULL },
+ 		{ "show-hidden", 's', 0, G_OPTION_ARG_NONE, &opts->show_hidden,
+ 		  "Show controls for ports with notOnGUI property on generic UI", NULL },
+-		{ "no-menu", 'n', 0, G_OPTION_ARG_NONE, &opts->no_menu,
++		{ "no-menu", 'm', 0, G_OPTION_ARG_NONE, &opts->no_menu,
+ 		  "Do not show Jalv menu on window", NULL },
+ 		{ "generic-ui", 'g', 0, G_OPTION_ARG_NONE, &opts->generic_ui,
+ 		  "Use Jalv generic UI and not the plugin UI", NULL},
+diff --git a/src/jalv_internal.h b/src/jalv_internal.h
+index 4d25109..5210672 100644
+--- a/src/jalv_internal.h
++++ b/src/jalv_internal.h
+@@ -174,6 +174,7 @@ typedef struct {
+ 	int      show_ui;           ///< Show non-embedded UI
+ 	int      print_controls;    ///< Print control changes to stdout
+ 	int      non_interactive;   ///< Do not listen for commands on stdin
++	int      oslp_mode;         ///< OSLP mode: write controls and monitors to external files
+ } JalvOptions;
+ 
+ typedef struct {

@@ -1,0 +1,13 @@
+[Unit]
+Description=Start the jack audio server system-wide
+
+[Service]
+EnvironmentFile=/etc/environment.d/99-oslp.conf
+Environment=JACK_NO_AUDIO_RESERVATION=1
+Type=simple
+User=root
+ExecStart=/usr/bin/jackd -d alsa -d $JACKDEV
+
+[Install]
+WantedBy=basic.target
+

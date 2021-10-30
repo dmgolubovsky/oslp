@@ -1,0 +1,16 @@
+[Unit]
+Description=Start the ALSA->Jack MIDI bridge
+Requires=jackd.service
+After=jackd.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/a2jmidid -eu
+ExecStop=/usr/bin/killall a2jmidid
+Restart=always
+RestartSec=4
+
+[Install]
+WantedBy=basic.target
+
