@@ -1,0 +1,11 @@
+[Unit]
+Description=Display log on the console
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/journalctl -f
+StandardOutput=file:/dev/console
+
+[Install]
+WantedBy=basic.target

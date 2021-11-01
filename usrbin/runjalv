@@ -13,8 +13,6 @@ altcl=`basename json/zyn.json '.json'`
 
 client=`jq '.[].client|select(. != null)' "$1/$2" | tr -d '"'`
 
-gui=`jq '.[].gui|select(. != null)' "$1/$2"`
-
 guifl=""
 jalvx=""
 
@@ -35,5 +33,13 @@ jalvx=""
 	exit 1
 }
 
-jalv${jalvx} $guifl -n "$client" -x "$uri" < "/tmp/${client}.in" > /dev/null
+loadfl=""
+loaddir=""
+
+[ -d "${OSLP_SAVED_STATE_PATH}/$client" ] && {
+	loadfl="-l"
+	loaddir="${OSLP_SAVED_STATE_PATH}/$client"
+}
+
+jalv${jalvx} $guifl -n "$client" -x "$loadfl" "$loaddir" "$uri" < "/tmp/${client}.in" > /dev/null
 

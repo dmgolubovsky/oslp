@@ -108,7 +108,7 @@ add units /lib/systemd/system
 run mkdir -p /usr/lib/oslp/json
 add json /usr/lib/oslp/json
 
-run systemctl enable jackd.service a2jmidid.service
+run systemctl enable jackd.service a2jmidid.service conlog.service
 run systemctl disable systemd-resolved.service
 run systemctl disable networkd-dispatcher.service
 run systemctl disable console-getty.service
