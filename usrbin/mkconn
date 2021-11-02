@@ -19,5 +19,5 @@ jq '.[].connect|select(. != null)' "$1/$2" | sed 's/[\{\}\,]//g' | grep -v '^$' 
   k=`echo '{'"$kv"'}'| jq 'keys[0]' | tr -d '"'`
   v=`echo '{'"$kv"'}'| jq '.[]' | tr -d '"'`
   vv=`jq "$v|select(. != null)"  --slurp $1/*.json | tr -d '"'`
-  jack_${dis}connect "$k" "$vv"
+  [ "$vv" = "none" ] || jack_${dis}connect "$k" "$vv"
 done

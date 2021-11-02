@@ -97,7 +97,7 @@ run apt -y update
 run rm -rf /install-kx
 
 run env DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends jackd2 a2jmidid alsa-utils \
-        amsynth zynaddsubfx lilv-utils aj-snapshot helm non-mixer python3 jq x11-utils \
+        amsynth zynaddsubfx lilv-utils aj-snapshot helm non-mixer python3 jq x11-utils x42-plugins \
 	xterm xinit psmisc dbus-x11 locales gmrun liblilv-0-0 libsratom-0-0 libserd-0-0 libsuil-0-0 libgtk-3-0
 
 run update-alternatives --install /usr/bin/python python /usr/bin/python3 1

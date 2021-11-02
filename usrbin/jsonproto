@@ -1,0 +1,36 @@
+#! /bin/bash
+
+# Generate a prototype json given plugin URI and client name on the stdout.
+# The prototype will have uri, client, description, and connect populated.
+# Connect points will be set to "none"
+
+# The prototype is expected to be further populated manually
+
+# jsonproto uri client - both arguments are mandatory
+
+[ -z "$2" ] && {
+	echo "Usage: `basename $0` uri client" >&2
+	exit 1
+}
+
+uri="$1"
+client="$2"
+
+descr=`plugin_info.py "$uri" | jq .label`
+
+function portlist {
+	kind="$1"
+	comma=""
+	plugin_info.py "$uri" | jq .ports.${kind}[][].symbol | while read port ; do
+		echo $comma $port: \"none\"
+		comma=", "
+	done
+}
+
+midi=`portlist midi`
+audio=`portlist audio`
+
+[ -z "$midi" -o -z "$audio" ] && c2="" || c2=", "
+
+echo '{' \""$client"\": '{' \"uri\": \""$uri"\", \"description\": $descr, \"client\": \""$client"\", \"connect\": '{' "$midi" "$c2" "$audio" '} } }' | jq
+
