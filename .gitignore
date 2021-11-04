@@ -26,3 +26,4 @@ dist
 *.swp
 *.wav
 .envrc
+jalv/

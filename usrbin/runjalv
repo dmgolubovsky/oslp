@@ -36,7 +36,7 @@ jalvx=""
 loadfl=""
 loaddir=""
 
-[ -d "${OSLP_SAVED_STATE_PATH}/$client" ] && {
+[ -f "${OSLP_SAVED_STATE_PATH}/${client}/state.ttl" ] && {
 	loadfl="-l"
 	loaddir="${OSLP_SAVED_STATE_PATH}/$client"
 }
