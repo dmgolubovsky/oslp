@@ -21,8 +21,8 @@ descr=`plugin_info.py "$uri" | jq .label`
 function portlist {
 	kind="$1"
 	comma=""
-	plugin_info.py "$uri" | jq .ports.${kind}[][].symbol | while read port ; do
-		echo $comma $port: \"none\"
+	plugin_info.py "$uri" | jq .ports.${kind}[][].symbol | tr -d '"' | while read port ; do
+		echo $comma \""${client}:${port}"\": \"none\"
 		comma=", "
 	done
 }
@@ -30,7 +30,16 @@ function portlist {
 midi=`portlist midi`
 audio=`portlist audio`
 
+function inouts {
+	plugin_info.py "$uri" | jq '(.ports.midi, .ports.audio)[][].symbol' |tr -d '"' | while read port ; do
+		echo \""${port}"\": \""${client}:${port}\"",
+	done	
+}
+
+ports=`inouts`
+
 [ -z "$midi" -o -z "$audio" ] && c2="" || c2=", "
 
-echo '{' \""$client"\": '{' \"uri\": \""$uri"\", \"description\": $descr, \"client\": \""$client"\", \"connect\": '{' "$midi" "$c2" "$audio" '} } }' | jq
+echo '{' \""$client"\": '{' \"uri\": \""$uri"\", \"description\": $descr, \"client\": \""$client"\", \
+	$ports \"connect\": '{' "$midi" "$c2" "$audio" '} } }' | jq
 

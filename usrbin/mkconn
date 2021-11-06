@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh -e
 
 # $1: JSON directory
 # $2: JSON file to process
@@ -18,6 +18,8 @@ dis="$3"
 jq '.[].connect|select(. != null)' "$1/$2" | sed 's/[\{\}\,]//g' | grep -v '^$' | while read kv ; do
   k=`echo '{'"$kv"'}'| jq 'keys[0]' | tr -d '"'`
   v=`echo '{'"$kv"'}'| jq '.[]' | tr -d '"'`
-  vv=`jq "$v|select(. != null)"  --slurp $1/*.json | tr -d '"'`
-  [ "$vv" = "none" ] || jack_${dis}connect "$k" "$vv"
+  [ "$v" = "none" ] || {
+    vv=`jq "$v|select(. != null)"  --slurp $1/*.json | tr -d '"'`
+    jack_${dis}connect "$k" "$vv"
+  }
 done

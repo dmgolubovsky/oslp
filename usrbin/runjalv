@@ -39,7 +39,7 @@ loaddir=""
 [ -f "${OSLP_SAVED_STATE_PATH}/${client}/state.ttl" ] && {
 	loadfl="-l"
 	loaddir="${OSLP_SAVED_STATE_PATH}/$client"
-}
+} || mkdir -p "${OSLP_SAVED_STATE_PATH}/$client"
 
 jalv${jalvx} $guifl -n "$client" -x "$loadfl" "$loaddir" "$uri" < "/tmp/${client}.in" > /dev/null
 
