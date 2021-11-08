@@ -1,0 +1,40 @@
+#! /bin/bash
+
+[ -z "$DISPLAY" ] && exit
+
+# Get all active windows ID
+
+function winlist {
+	wmctrl -l | cut -d" " -f 1
+}
+
+# Get all plugin windows (WM_WINDOW_ROLE = plugin_ui)
+
+function pwlist {
+	for win in `winlist` ; do
+		role=`xprop -id "$win" WM_WINDOW_ROLE | grep "plugin_ui" | wc -l`
+		[ x"$role" = x1 ] && echo $win " "
+	done
+}
+
+pwl="`pwlist`"
+
+# Given a window ID activate the window, minimize all others
+
+function pwshow {
+	for win in $pwl ; do
+		[ "$win" = "$1" ] && xdotool windowactivate "$win" || xdotool windowminimize "$win"
+	done
+}
+
+# Display plugin window selection dialog
+
+function pwldlg {
+	for win in $pwl ; do
+		title=`xprop -id "$win" WM_NAME | cut -d'=' -f 2`
+		echo "$win" "$title"
+	done
+}
+
+pwshow `pwldlg | xargs zenity --list --column ID --column Plugin --print-column=1 2>/dev/null`
+

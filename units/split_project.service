@@ -1,0 +1,7 @@
+[Unit]
+Description=Toplevel unit for the split synth project
+Requires=synth@split.service synth@msplit.service synth@split_helm.service synth@split_zyn.service
+
+[Service]
+Type=simple
+ExecStart=/bin/sleep inf

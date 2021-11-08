@@ -1,0 +1,6 @@
+{
+	"yamaha": {
+		"description": "Yamaha DGX-650",
+		"midi_out": "a2j:Portable Grand (capture): Portable Grand MIDI 1"
+	}
+}

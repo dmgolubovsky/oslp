@@ -1,0 +1,12 @@
+{
+  "split_helm": {
+    "uri": "http://tytel.org/helm",
+    "description": "Helm",
+    "client": "split_helm",
+    "connect": {
+      "split_helm:lv2_events_in": ".[].msplit.lv2_midi_out_1",
+      "split_helm:lv2_audio_out_1": ".[].system.out_L",
+      "split_helm:lv2_audio_out_2": ".[].system.out_R"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "split": {
+    "uri": "http://gareus.org/oss/lv2/midifilter#keysplit",
+    "description": "MIDI Keysplit",
+    "client": "split",
+    "midiout": "split:midiout",
+    "connect": {
+      "split:midiin": ".[].apro.midi_out",
+      "split:midiin": ".[].yamaha.midi_out"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "split_zyn": {
+    "uri": "http://zynaddsubfx.sourceforge.net",
+    "description": "ZynAddSubFX",
+    "client": "split_zyn",
+    "connect": {
+      "split_zyn:lv2_events_in": ".[].msplit.lv2_midi_out_2",
+      "split_zyn:lv2_audio_out_1": ".[].system.out_L",
+      "split_zyn:lv2_audio_out_2": ".[].system.out_R"
+    }
+  }
+}
