@@ -1,7 +1,9 @@
 [Unit]
 Description=Toplevel unit for the split synth project
 Requires=synth@split.service synth@msplit.service synth@split_helm.service synth@split_zyn.service
+DefaultDependencies=no
 
 [Service]
 Type=simple
 ExecStart=/bin/sleep inf
+ExecStop=sh -cx 'systemctl stop `systemctl show %n | grep ^Requires= | cut -d'=' -f 2`'
