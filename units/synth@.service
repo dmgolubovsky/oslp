@@ -3,7 +3,7 @@ Description=Run a LV2 plugin as part of Jack connection graph e. g. synth@zyn.se
 Requires=pipersist@%i.in.service 
 Wants=mkconn@%i.service
 After=pipersist@%i.in.service
-After=pipersist@%i.out.service
+DefaultDependencies=No
 
 [Service]
 Type=simple

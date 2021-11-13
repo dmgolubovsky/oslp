@@ -58,7 +58,7 @@ index 7d11714..eac2bd0 100644
  
  static int
 diff --git a/src/jalv_gtk.c b/src/jalv_gtk.c
-index 71259bd..38e35d9 100644
+index 71259bd..cfb4f57 100644
 --- a/src/jalv_gtk.c
 +++ b/src/jalv_gtk.c
 @@ -101,7 +101,7 @@ jalv_init(int* argc, char*** argv, JalvOptions* opts)
@@ -70,11 +70,20 @@ index 71259bd..38e35d9 100644
  		  "Do not show Jalv menu on window", NULL },
  		{ "generic-ui", 'g', 0, G_OPTION_ARG_NONE, &opts->generic_ui,
  		  "Use Jalv generic UI and not the plugin UI", NULL},
-@@ -154,7 +154,14 @@ on_save_activate(ZIX_UNUSED GtkWidget* widget, void* ptr)
+@@ -147,6 +147,7 @@ static void
+ on_save_activate(ZIX_UNUSED GtkWidget* widget, void* ptr)
+ {
+ 	Jalv* jalv = (Jalv*)ptr;
++#if 0	
+ 	GtkWidget* dialog = gtk_file_chooser_dialog_new(
+ 		"Save State",
+ 		(GtkWindow*)jalv->window,
+@@ -154,7 +155,20 @@ on_save_activate(ZIX_UNUSED GtkWidget* widget, void* ptr)
  		"_Cancel", GTK_RESPONSE_CANCEL,
  		"_Save", GTK_RESPONSE_ACCEPT,
  		NULL);
 -
++#endif
 +	char dpath[200];
 +	char *oslpstate = getenv("OSLP_SAVED_STATE_PATH");
 +	if (oslpstate == NULL) {
@@ -82,11 +91,24 @@ index 71259bd..38e35d9 100644
 +	} else {
 +		snprintf(dpath, 199, "%s/%s", oslpstate, jalv->opts.name);
 +	}
++	char cmd[250];
++	snprintf(cmd, 249, "mkdir -p \"%s\"", dpath);
++	int rc = system(cmd);
++	if (rc ==0) jalv_save(jalv, dpath);
++#if 0
 +	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(dialog), dpath);
  	if (gtk_dialog_run(GTK_DIALOG(dialog)) == GTK_RESPONSE_ACCEPT) {
  		char* path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dialog));
  		char* base = g_build_filename(path, "/", NULL);
-@@ -200,11 +207,12 @@ set_window_title(Jalv* jalv)
+@@ -164,6 +178,7 @@ on_save_activate(ZIX_UNUSED GtkWidget* widget, void* ptr)
+ 	}
+ 
+ 	gtk_widget_destroy(dialog);
++#endif
+ }
+ 
+ static void
+@@ -200,11 +215,12 @@ set_window_title(Jalv* jalv)
  	const char* plugin = lilv_node_as_string(name);
  	if (jalv->preset) {
  		const char* preset_label = lilv_state_get_label(jalv->preset);
@@ -101,7 +123,7 @@ index 71259bd..38e35d9 100644
  	}
  	lilv_node_free(name);
  }
-@@ -1231,6 +1239,7 @@ jalv_open_ui(Jalv* jalv)
+@@ -1231,6 +1247,7 @@ jalv_open_ui(Jalv* jalv)
  	g_timeout_add(1000 / jalv->ui_update_hz, (GSourceFunc)jalv_update, jalv);
  
  	gtk_window_present(GTK_WINDOW(window));
