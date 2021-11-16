@@ -9,4 +9,5 @@ DefaultDependencies=No
 Type=simple
 EnvironmentFile=/etc/environment.d/99-oslp.conf
 ExecStart=/usr/bin/runjalv "$OSLP_JSON_PATH" "%i.json"
+ExecStop=sh -c 'systemctl stop `systemctl show %n | grep ^Requires= | cut -d'=' -f 2`'
 ExecStopPost=systemctl kill pipersist@%i.in.service
