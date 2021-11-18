@@ -1,0 +1,11 @@
+{
+  "twos_apro": {
+    "description": "Use A-PRO with twosplit",
+    "requires": ["syngrp@twosplit"],
+    "client": "twos_apro",
+    "class": "syngrp",
+    "connect": {
+      "twosplit_k:midiin": ".[].apro.midi_out"
+    }
+  }
+}

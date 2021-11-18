@@ -1,0 +1,15 @@
+[Unit]
+Description=Make JACK connections on behalf of syngrp@%i
+BindsTo=syngrp@%i.service
+After=syngrp@%i.service
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/environment.d/99-oslp.conf
+ExecStartPre=/usr/bin/mkconn "$OSLP_JSON_PATH" "%i.json" ""
+ExecStart=/bin/sleep inf
+ExecStop=-/usr/bin/mkconn  "$OSLP_JSON_PATH" "%i.json" "dis"
+Restart=always
+RestartSec=4
+
+

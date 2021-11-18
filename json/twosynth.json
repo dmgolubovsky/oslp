@@ -1,0 +1,16 @@
+{
+  "twosplit": {
+    "description": "Two synthesizers fed from twosplit",
+    "requires": ["syngrp@twosplit", "synth@split_zyn", "synth@split_helm"],
+    "client": "twosynth",
+    "class": "syngrp",
+    "connect": {
+      "split_helm:lv2_events_in":   ".[].twosplit.out1",
+      "split_helm:lv2_audio_out_1": ".[].system.out_L",
+      "split_helm:lv2_audio_out_2": ".[].system.out_R",
+      "split_zyn:lv2_events_in":    ".[].twosplit.out2",
+      "split_zyn:lv2_audio_out_1":  ".[].system.out_L",
+      "split_zyn:lv2_audio_out_2":  ".[].system.out_R"
+    }
+  }
+}

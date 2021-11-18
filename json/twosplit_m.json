@@ -1,0 +1,43 @@
+{
+  "twosplit_m": {
+    "uri": "http://kxstudio.sf.net/carla/plugins/midisplit",
+    "description": "MIDI Split",
+    "client": "twosplit_m",
+    "lv2_midi_in": "twosplit_m:lv2_midi_in",
+    "lv2_midi_out_1": "twosplit_m:lv2_midi_out_1",
+    "lv2_midi_out_2": "twosplit_m:lv2_midi_out_2",
+    "lv2_midi_out_3": "twosplit_m:lv2_midi_out_3",
+    "lv2_midi_out_4": "twosplit_m:lv2_midi_out_4",
+    "lv2_midi_out_5": "twosplit_m:lv2_midi_out_5",
+    "lv2_midi_out_6": "twosplit_m:lv2_midi_out_6",
+    "lv2_midi_out_7": "twosplit_m:lv2_midi_out_7",
+    "lv2_midi_out_8": "twosplit_m:lv2_midi_out_8",
+    "lv2_midi_out_9": "twosplit_m:lv2_midi_out_9",
+    "lv2_midi_out_10": "twosplit_m:lv2_midi_out_10",
+    "lv2_midi_out_11": "twosplit_m:lv2_midi_out_11",
+    "lv2_midi_out_12": "twosplit_m:lv2_midi_out_12",
+    "lv2_midi_out_13": "twosplit_m:lv2_midi_out_13",
+    "lv2_midi_out_14": "twosplit_m:lv2_midi_out_14",
+    "lv2_midi_out_15": "twosplit_m:lv2_midi_out_15",
+    "lv2_midi_out_16": "twosplit_m:lv2_midi_out_16",
+    "connect": {
+      "twosplit_m:lv2_midi_in": "none",
+      "twosplit_m:lv2_midi_out_1": "none",
+      "twosplit_m:lv2_midi_out_2": "none",
+      "twosplit_m:lv2_midi_out_3": "none",
+      "twosplit_m:lv2_midi_out_4": "none",
+      "twosplit_m:lv2_midi_out_5": "none",
+      "twosplit_m:lv2_midi_out_6": "none",
+      "twosplit_m:lv2_midi_out_7": "none",
+      "twosplit_m:lv2_midi_out_8": "none",
+      "twosplit_m:lv2_midi_out_9": "none",
+      "twosplit_m:lv2_midi_out_10": "none",
+      "twosplit_m:lv2_midi_out_11": "none",
+      "twosplit_m:lv2_midi_out_12": "none",
+      "twosplit_m:lv2_midi_out_13": "none",
+      "twosplit_m:lv2_midi_out_14": "none",
+      "twosplit_m:lv2_midi_out_15": "none",
+      "twosplit_m:lv2_midi_out_16": "none"
+    }
+  }
+}

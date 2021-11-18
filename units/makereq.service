@@ -1,0 +1,11 @@
+[Unit]
+Description=Make required dependencies of the synth group units
+
+[Service]
+EnvironmentFile=/etc/environment.d/99-oslp.conf
+Type=oneshot
+User=root
+ExecStart=/usr/bin/mkreq "$OSLP_JSON_PATH"
+
+[Install]
+WantedBy=basic.target

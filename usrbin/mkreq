@@ -1,0 +1,21 @@
+#! /bin/bash
+
+# Run this script before any synth unit is started to add dependencies to
+# the group synth units
+
+# The below expression returns all synth node client names that have the "requires" property.
+# jq '.[][]|. as $parent | .requires as $req | select($req != null) | $parent.client' --slurp json/*.json
+
+# $1: JSON directory
+
+[ -z "$1" ] && exit
+
+jq '.[][]|. as $parent | .requires as $req | select($req != null) | ($parent.class+"@"+$parent.client)' --slurp "$1"/*.json | while read par ; do
+        upar=`echo $par | tr -d '"'`
+	xpar=`echo $upar | cut -d'@' -f 2`
+	jq '.[].requires' "$1/${xpar}.json" | tr -d '[],"' | grep -v '^$' | while read req ; do
+		systemctl add-requires ${upar}.service ${req}.service
+	done
+done
+
+

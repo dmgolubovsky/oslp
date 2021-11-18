@@ -62,7 +62,15 @@ run ./waf
 
 run ./waf install
 
-run ls -l /usr/lib/python3/dist-packages
+# Build few more LV2 plugins in the same build environment
+
+workdir /
+
+run git clone https://github.com/unclechu/lv2-stereo-mixer.git
+
+workdir lv2-stereo-mixer
+
+run make
 
 # Jack Audio Tools (LV2) https://github.com/SpotlightKid/jack-audio-tools
 
@@ -97,7 +105,7 @@ run apt -y update
 run rm -rf /install-kx
 
 run env DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends jackd2 a2jmidid alsa-utils \
-        amsynth zynaddsubfx lilv-utils aj-snapshot helm non-mixer python3 jq x11-utils x42-plugins carla \
+        amsynth zynaddsubfx lilv-utils aj-snapshot helm python3 jq x11-utils x42-plugins carla \
 	xterm xinit psmisc dbus-x11 locales gmrun liblilv-0-0 libsratom-0-0 libserd-0-0 libsuil-0-0 libgtk-3-0 \
 	wmctrl zenity xdotool
 
@@ -130,6 +138,10 @@ copy --from=jad /jack-audio-tools/lv2 /usr/bin
 run mkdir -p /usr/lib/python3/dist-packages/
 
 copy --from=lilvpy /usr/lib/python3/dist-packages/lilv.py /usr/lib/python3/dist-packages/
+
+run mkdir -p /usr/lib/lv2/stereo-mixer.lv2
+
+copy --from=lilvpy /lv2-stereo-mixer/stereo-mixer.lv2 /usr/lib/lv2/stereo-mixer.lv2
 
 # Symlink lv2 from incorrect install locations
 

@@ -1,0 +1,10 @@
+[Unit]
+Description=Combine several LV2 plugin into part of Jack connection graph but load no plugins per se
+Wants=mkcong@%i.service
+DefaultDependencies=No
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/environment.d/99-oslp.conf
+ExecStart=/bin/sleep inf
+ExecStop=sh -c 'systemctl stop `systemctl show %n | grep ^Requires= | cut -d'=' -f 2`'

@@ -1,0 +1,13 @@
+{
+  "twosplit_k": {
+    "uri": "http://gareus.org/oss/lv2/midifilter#keysplit",
+    "description": "MIDI Keysplit",
+    "client": "twosplit_k",
+    "midiin": "twosplit_k:midiin",
+    "midiout": "twosplit_k:midiout",
+    "connect": {
+      "twosplit_k:midiin": "none",
+      "twosplit_k:midiout": "none"
+    }
+  }
+}
