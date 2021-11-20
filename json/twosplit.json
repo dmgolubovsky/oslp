@@ -8,7 +8,7 @@
     "out1": "twosplit_m:lv2_midi_out_1",
     "out2": "twosplit_m:lv2_midi_out_2",
     "connect": {
-      "twosplit_k:midiout": ".[].twosplit_m.lv2_midi_in"
+      "twosplit_k:midiout": "@twosplit_m.lv2_midi_in"
     }
   }
 }

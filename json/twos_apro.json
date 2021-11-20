@@ -5,7 +5,7 @@
     "client": "twos_apro",
     "class": "syngrp",
     "connect": {
-      "twosplit_k:midiin": ".[].apro.midi_out"
+      "twosplit_k:midiin": "@apro.midi_out"
     }
   }
 }

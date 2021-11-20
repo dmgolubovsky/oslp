@@ -5,8 +5,8 @@
     "client": "split",
     "midiout": "split:midiout",
     "connect": {
-      "split:midiin": ".[].apro.midi_out",
-      "split:midiin": ".[].yamaha.midi_out"
+      "split:midiin": "@apro.midi_out",
+      "split:midiin": "@yamaha.midi_out"
     }
   }
 }

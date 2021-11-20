@@ -1,5 +1,5 @@
 [Unit]
-Description=Run a LV2 plugin as part of Jack connection graph e. g. synth@zyn.service
+Description=Run a LV2 plugin as part of Jack connection graph synth@%i.service
 Requires=pipersist@%i.in.service 
 Wants=mkconn@%i.service
 After=pipersist@%i.in.service
@@ -9,5 +9,5 @@ DefaultDependencies=No
 Type=simple
 EnvironmentFile=/etc/environment.d/99-oslp.conf
 ExecStart=/usr/bin/runjalv "$OSLP_JSON_PATH" "%i.json"
-ExecStop=sh -c 'systemctl stop `systemctl show %n | grep ^Requires= | cut -d'=' -f 2`'
+ExecStop=sh -c 'systemctl kill `systemctl show %n | grep ^Requires= | cut -d'=' -f 2`'
 ExecStopPost=systemctl kill pipersist@%i.in.service

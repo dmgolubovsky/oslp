@@ -21,7 +21,7 @@
     "lv2_midi_out_15": "msplit:lv2_midi_out_15",
     "lv2_midi_out_16": "msplit:lv2_midi_out_16",
     "connect": {
-      "msplit:lv2_midi_in": ".[].split.midiout",
+      "msplit:lv2_midi_in": "@split.midiout",
       "msplit:lv2_midi_out_1": "none",
       "msplit:lv2_midi_out_2": "none",
       "msplit:lv2_midi_out_3": "none",

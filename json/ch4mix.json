@@ -1,0 +1,24 @@
+{
+  "twosplit": {
+    "description": "Four channel mixer",
+    "auto": {
+      "ch1": "https://github.com/unclechu/lv2-stereo-mixer",
+      "ch2": "https://github.com/unclechu/lv2-stereo-mixer",
+      "ch3": "https://github.com/unclechu/lv2-stereo-mixer",
+      "ch4": "https://github.com/unclechu/lv2-stereo-mixer"
+    },
+    "requires": [ "synth@ch1", "synth@ch2", "synth@ch3", "synth@ch4" ],
+    "client": "ch4mix",
+    "class": "syngrp",
+    "connect": {
+      "ch1:output_l": "@system.out_L",
+      "ch1:output_r": "@system.out_R",
+      "ch2:output_l": "@system.out_L",
+      "ch2:output_r": "@system.out_R",
+      "ch3:output_l": "@system.out_L",
+      "ch3:output_r": "@system.out_R",
+      "ch4:output_l": "@system.out_L",
+      "ch4:output_r": "@system.out_R"
+    }
+  }
+}
