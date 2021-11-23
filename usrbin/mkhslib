@@ -1,0 +1,32 @@
+#! /bin/bash
+
+# Make a Haskell library of existing plugins
+
+pn=0
+
+function portlist {
+	uri="$1"
+        kind="$2"
+	cons="$3"
+        comma=""
+        plugin_info.py "$uri" | jq ".ports.${kind}[].symbol" | while read port ; do
+                echo -n $comma ${cons} ${port}
+                comma=", "
+        done
+}
+
+
+for p in `lv2ls` ; do
+  uri=`plugin_info.py $p | jq '.uri'`
+  name=`plugin_info.py $p | jq '.name'`
+  echo "plug$pn :: PluginDef"
+  echo "plug$pn = PluginDef {"
+  echo "  uri = $uri,"
+  echo "  name = $name,"
+  echo "  midiInputPorts = [ `portlist $p midi.input MidiInputPort` ],"
+  echo "  midiOutputPorts = [ `portlist $p midi.output MidiOutputPort` ],"
+  echo "  audioInputPorts = [ `portlist $p audio.input AudioInputPort` ],"
+  echo "  audioOutputPorts = [ `portlist $p audio.output AudioOutputPort` ]"
+  echo "}"
+  pn=$(( ${pn}+1 ))
+done

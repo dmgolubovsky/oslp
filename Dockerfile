@@ -11,7 +11,7 @@ run apt install -y --no-install-recommends systemd-sysv
 
 from base-ubuntu as builder
 
-run apt -y install build-essential git make
+run apt -y install build-essential git make wget
 
 # JALV
 
@@ -107,7 +107,7 @@ run rm -rf /install-kx
 run env DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends jackd2 a2jmidid alsa-utils \
         amsynth zynaddsubfx lilv-utils aj-snapshot helm python3 jq x11-utils x42-plugins carla \
 	xterm xinit psmisc dbus-x11 locales gmrun liblilv-0-0 libsratom-0-0 libserd-0-0 libsuil-0-0 libgtk-3-0 \
-	wmctrl zenity xdotool
+	wmctrl zenity xdotool hugs
 
 run update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
