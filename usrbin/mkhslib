@@ -4,29 +4,87 @@
 
 pn=0
 
+# Generate a list of ports
+
 function portlist {
 	uri="$1"
         kind="$2"
 	cons="$3"
+	pi="$4"
         comma=""
-        plugin_info.py "$uri" | jq ".ports.${kind}[].symbol" | while read port ; do
+#        pi=`plugin_info.py $uri`
+        echo $pi | jq ".ports.${kind}[].symbol" | while read port ; do
                 echo -n $comma ${cons} ${port}
                 comma=", "
         done
 }
 
+# Prologue 
+
+cat <<end.end.end
+
+module PluginBase (PluginDef(..), PluginPort(..), plugNameMap, plugUriMap) where
+
+import qualified Data.Map as M
+
+data PluginDef = PluginDef {
+  plugUri :: String,
+  plugName :: String,
+  midiInputPorts :: [PluginPort],
+  midiOutputPorts :: [PluginPort],
+  audioInputPorts :: [PluginPort],
+  audioOutputPorts :: [PluginPort]
+}
+
+data PluginPort =
+   MidiInputPort String
+ | MidiOutputPort String
+ | AudioInputPort String
+ | AudioOutputPort String
+
+
+end.end.end
+
+# Body
+
+pl=""
+plcm=""
 
 for p in `lv2ls` ; do
-  uri=`plugin_info.py $p | jq '.uri'`
-  name=`plugin_info.py $p | jq '.name'`
+  pi=`plugin_info.py $p`
+  uri=`echo $pi | jq '.uri'`
+  name=`echo $pi | jq '.name'`
   echo "plug$pn :: PluginDef"
   echo "plug$pn = PluginDef {"
-  echo "  uri = $uri,"
-  echo "  name = $name,"
-  echo "  midiInputPorts = [ `portlist $p midi.input MidiInputPort` ],"
-  echo "  midiOutputPorts = [ `portlist $p midi.output MidiOutputPort` ],"
-  echo "  audioInputPorts = [ `portlist $p audio.input AudioInputPort` ],"
-  echo "  audioOutputPorts = [ `portlist $p audio.output AudioOutputPort` ]"
+  echo "  plugUri = $uri,"
+  echo "  plugName = $name,"
+  echo "  midiInputPorts = [ `portlist $p midi.input MidiInputPort "$pi"` ],"
+  echo "  midiOutputPorts = [ `portlist $p midi.output MidiOutputPort "$pi"` ],"
+  echo "  audioInputPorts = [ `portlist $p audio.input AudioInputPort "$pi"` ],"
+  echo "  audioOutputPorts = [ `portlist $p audio.output AudioOutputPort "$pi"` ]"
   echo "}"
+  pl="${pl}${plcm} plug$pn"
   pn=$(( ${pn}+1 ))
+  plcm=", "
 done
+
+echo "plugList :: [PluginDef]"
+echo "plugList = [ $pl ]"
+
+# Epilogue
+
+cat <<end.end.end
+
+zuri = zip (map plugUri plugList) plugList
+
+zname = zip (map plugName plugList) plugList
+
+plugNameMap :: M.Map String PluginDef
+
+plugNameMap = M.fromList zname
+
+plugUriMap :: M.Map String PluginDef
+
+plugUriMap = M.fromList zuri
+
+end.end.end

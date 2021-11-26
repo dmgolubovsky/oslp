@@ -147,6 +147,12 @@ copy --from=lilvpy /lv2-stereo-mixer/stereo-mixer.lv2 /usr/lib/lv2/stereo-mixer.
 
 run ln -sf /usr/lib/x86_64-linux-gnu/liblilv-0.so.0 /usr/lib/x86_64-linux-gnu/liblilv-0.so
 
+# Generate the Haskell plugins database
+
+run mkdir -p /usr/lib/oslp/haskell
+
+run /usr/bin/mkhslib >/usr/lib/oslp/haskell/PluginBase.hs
+
 # Flatten image
 
 from scratch
