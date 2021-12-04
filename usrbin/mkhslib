@@ -12,7 +12,6 @@ function portlist {
 	cons="$3"
 	pi="$4"
         comma=""
-#        pi=`plugin_info.py $uri`
         echo $pi | jq ".ports.${kind}[].symbol" | while read port ; do
                 echo -n $comma ${cons} ${port}
                 comma=", "
@@ -23,7 +22,7 @@ function portlist {
 
 cat <<end.end.end
 
-module PluginBase (PluginDef(..), PluginPort(..), plugNameMap, plugUriMap) where
+module PluginBase (PluginDef(..), PluginPort(..), plugNameMap, plugUriMap, portName) where
 
 import qualified Data.Map as M
 
@@ -34,14 +33,21 @@ data PluginDef = PluginDef {
   midiOutputPorts :: [PluginPort],
   audioInputPorts :: [PluginPort],
   audioOutputPorts :: [PluginPort]
-}
+} deriving (Eq)
 
 data PluginPort =
    MidiInputPort String
  | MidiOutputPort String
  | AudioInputPort String
  | AudioOutputPort String
+   deriving (Eq)
 
+portName :: PluginPort -> String
+
+portName (MidiInputPort s) = s
+portName (MidiOutputPort s) = s
+portName (AudioInputPort s) = s
+portName (AudioOutputPort s) = s
 
 end.end.end
 

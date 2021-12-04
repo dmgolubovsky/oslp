@@ -153,6 +153,20 @@ run mkdir -p /usr/lib/oslp/haskell
 
 run /usr/bin/mkhslib >/usr/lib/oslp/haskell/PluginBase.hs
 
+add haskell /usr/lib/oslp/haskell
+
+workdir /usr/lib/oslp/haskell
+
+run for f in *.hs; do echo :q | hugs $f | egrep '(^ERROR|^\*\*\*)' | tee /dev/stderr | grep ^ERROR | wc -l | (read n ;exit $n) ; done
+
+# Install yq
+
+run wget -qO /usr/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+
+run chmod +x /usr/bin/yq
+
+run yq --version
+
 # Flatten image
 
 from scratch
