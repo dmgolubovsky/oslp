@@ -26,6 +26,10 @@ data PlugInst = PlugInst (Maybe PluginDef) String deriving (Eq)
 data ClientPort = ClientPort (Maybe PlugInst) PluginPort
   deriving (Eq)
 
+clientPortName :: ClientPort -> String
+
+clientPortName (ClientPort Nothing pp) = portName pp
+clientPortName (ClientPort (Just (PlugInst _ s)) pp) = s ++ ":" ++ (portName pp)
 
 -- A class to provide client port. For hardware ports port itself is returned.
 -- For plugin ports the head of the respective port list is returned, or Nothing.
@@ -111,4 +115,30 @@ instance ClientPortProvider PluginGroup where
       MidiOutputPort "" -> Nothing
       AudioInputPort "" -> pgInputAudioPair pg
       AudioOutputPort "" -> pgOutputAudioPair pg
+
+-- Serial composition
+
+ser :: (ClientPortProvider a, ClientPortProvider b) => a -> b -> PluginGroup
+
+ser src dst = PluginGroup {
+  pgMidiInput = getClientPort src MidiInputPort,
+  pgMidiOutput = getClientPort dst MidiOutputPort,
+  pgInputAudioPair = getAudioPair src AudioInputPort,
+  pgOutputAudioPair = getAudioPair dst AudioOutputPort,
+  pgConnections = midicon ++ audiocon ++ getConnections src ++ getConnections dst,
+  pgRequires = getRequires src ++ getRequires dst,
+  pgAutos = getAutos src ++ getAutos dst
+} where
+    midicon = k cp1 cp2
+    cp1 = getClientPort src MidiOutputPort
+    cp2 = getClientPort dst MidiInputPort
+    k (Just p1) (Just p2) = [(clientPortName p1, clientPortName p2)]
+    k _ _ = []
+    audiocon = r ap1 ap2
+    ap1 = getAudioPair src AudioOutputPort
+    ap2 = getAudioPair dst AudioInputPort
+    r (Just (o1, o2)) (Just (i1, i2)) = [(clientPortName o1, clientPortName i1), (clientPortName o2, clientPortName i2)]
+    r _ _ = []
+
+
 

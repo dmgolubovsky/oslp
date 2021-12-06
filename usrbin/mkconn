@@ -19,8 +19,14 @@ jq '.[].connect|select(. != null)' "$1/$2" | sed 's/[\{\}\,]//g' | grep -v '^$' 
   k=`echo '{'"$kv"'}'| jq 'keys[0]' | tr -d '"'`
   v=`echo '{'"$kv"'}'| jq '.[]' | tr -d '"'`
   [ "$v" = "none" ] || {
-    va=`echo -n "$v" | sed 's/^@/.[]./g'`
-    vv=`jq "$va|select(. != null)"  --slurp $1/*.json | tr -d '"'`
-    jack_${dis}connect "$k" "$vv"
+    hash=`echo "$v" | grep '^#' | wc -l`
+    [ "$hash" = "0" ] && {
+      va=`echo -n "$v" | sed 's/^@/.[]./g'`
+      vv=`jq "$va|select(. != null)"  --slurp $1/*.json | tr -d '"'`
+      jack_${dis}connect "$k" "$vv"
+    } || {
+      vx=`echo -n "$v" | sed 's/^#//g'`
+      jack_${dis}connect "$k" "$vx"
+    }
   }
 done
