@@ -31,6 +31,22 @@ clientPortName :: ClientPort -> String
 clientPortName (ClientPort Nothing pp) = portName pp
 clientPortName (ClientPort (Just (PlugInst _ s)) pp) = s ++ ":" ++ (portName pp)
 
+-- A hardware group of Audio or MIDI ports. Port names are just entered directly.
+
+data HWPortGroup = HWPortGroup {
+  hwmInputPorts :: [PluginPort],
+  hwmOutputPorts :: [PluginPort],
+  hwaInputPorts :: [PluginPort],
+  hwaOutputPorts :: [PluginPort]
+} deriving (Eq)
+
+emptyHWPortGroup = HWPortGroup {
+  hwmInputPorts = [],
+  hwmOutputPorts = [],
+  hwaInputPorts = [],
+  hwaOutputPorts = []
+}
+
 -- A class to provide client port. For hardware ports port itself is returned.
 -- For plugin ports the head of the respective port list is returned, or Nothing.
 -- Autos, Requires, and Connections are necessary to build a JSON proper.
@@ -46,6 +62,27 @@ class ClientPortProvider c where
   getConnections _ = []
   getAudioPair :: c -> (String -> PluginPort) -> Maybe (ClientPort, ClientPort)
   getAudioPair _ _ = Nothing
+
+-- A Hardware group of ports only returns its ports but no plugins to instantiate.
+
+instance ClientPortProvider HWPortGroup where
+  getClientPort pd tag = k pdl where
+    pdl = case (tag "") of
+      MidiInputPort "" -> hwmInputPorts pd
+      MidiOutputPort "" -> hwmOutputPorts pd
+      AudioInputPort "" -> hwaInputPorts pd
+      AudioOutputPort "" -> hwaOutputPorts pd
+    k [] = Nothing
+    k (p:ps) = Just $ ClientPort Nothing p
+  getAudioPair pd tag = k pdl where
+    pdl = case (tag "") of
+      MidiInputPort "" -> []
+      MidiOutputPort "" -> []
+      AudioInputPort "" -> take 2 $ hwaInputPorts pd
+      AudioOutputPort "" -> take 2 $ hwaOutputPorts pd
+    k [] = Nothing
+    k [p1] = Just $ (ClientPort Nothing p1, ClientPort Nothing p1)
+    k [p1, p2] = Just $ (ClientPort Nothing p1, ClientPort Nothing p2)
 
 -- A ClientPort returns just itself if the tag matches its type
 
