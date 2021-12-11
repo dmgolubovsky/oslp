@@ -3,6 +3,7 @@ module PluginGraph where
 import PluginBase
 
 import qualified Data.Map as M
+import Data.List
 
 import Data.Maybe
 
@@ -177,5 +178,23 @@ ser src dst = PluginGroup {
     r (Just (o1, o2)) (Just (i1, i2)) = [(clientPortName o1, clientPortName i1), (clientPortName o2, clientPortName i2)]
     r _ _ = []
 
+-- Generate JSON for a PluginGroup providing a name for systemd service
 
+intercalate xs xss = (concat (intersperse xs xss))
+
+genJSON :: PluginGroup -> String -> String
+
+genJSON pg cs = top [descr, autos, requires, clnt, clss, connect] where
+  top ss = "{" ++ show cs ++ ": {" ++ intercalate ", " ss ++ "} }"
+  pair a b = show a ++ ": " ++ show b
+  descr = pair "description" cs
+  clnt = pair "client" cs
+  clss = pair "class" "syngrp"
+  list nl ls = show nl ++ ": [" ++ intercalate ", " (map show ls) ++ "]"
+  requires = list "requires" (getRequires pg)
+  listmap nl lsm = show nl ++ ": {" ++ intercalate ", " (map showmap lsm) ++ "}"
+  showmap (k, v) = show k ++ ": " ++ show v
+  autos = listmap "auto" $ getAutos pg
+  connect = listmap "connect" $ map mapsh $ getConnections pg
+  mapsh (f, s) = (f, '#':s)
 

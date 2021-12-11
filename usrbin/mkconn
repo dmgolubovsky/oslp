@@ -1,4 +1,4 @@
-#! /bin/sh -e
+#! /bin/sh
 
 # $1: JSON directory
 # $2: JSON file to process
