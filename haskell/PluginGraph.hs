@@ -19,7 +19,7 @@ plugByUri s = M.lookup s plugUriMap
 
 -- Instantiate a named plugin client
 
-data PlugInst = PlugInst (Maybe PluginDef) String deriving (Eq)
+data PlugInst = PlugInst (Maybe PluginDef) String deriving (Show, Eq)
 
 -- Client port representing both instance and its port. Can be used for both plugin and hardware ports.
 -- In the latter case plugin instance is Nothing
@@ -197,4 +197,22 @@ genJSON pg cs = top [descr, autos, requires, clnt, clss, connect] where
   autos = listmap "auto" $ getAutos pg
   connect = listmap "connect" $ map mapsh $ getConnections pg
   mapsh (f, s) = (f, '#':s)
+
+
+-- Breakout a plugin instance into multiple instances. May be useful with multichannel inputs or outputs.
+-- A split instance has a subset of input/output ports as designated by the filter function provided.
+-- Split indices start with 1
+
+breakOut :: PlugInst -> (Int -> (PluginPort, Int) -> Bool) -> [PlugInst]
+
+breakOut pi@(PlugInst Nothing _) _ = repeat pi
+
+breakOut (PlugInst (Just pd) inst) f = map x [1..] where
+  x i = PlugInst (Just pd') inst where
+    pd' = pd {
+      midiInputPorts = map fst $ filter (f i) (zip (midiInputPorts pd) [1..]),
+      midiOutputPorts = map fst $ filter (f i) (zip (midiOutputPorts pd) [1..]),
+      audioInputPorts = map fst $ filter (f i) (zip (audioInputPorts pd) [1..]),
+      audioOutputPorts = map fst $ filter (f i) (zip (audioOutputPorts pd) [1..])
+    }
 

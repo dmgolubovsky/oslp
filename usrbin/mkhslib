@@ -33,14 +33,14 @@ data PluginDef = PluginDef {
   midiOutputPorts :: [PluginPort],
   audioInputPorts :: [PluginPort],
   audioOutputPorts :: [PluginPort]
-} deriving (Eq)
+} deriving (Eq, Show)
 
 data PluginPort =
    MidiInputPort String
  | MidiOutputPort String
  | AudioInputPort String
  | AudioOutputPort String
-   deriving (Eq)
+   deriving (Eq, Show)
 
 portName :: PluginPort -> String
 
