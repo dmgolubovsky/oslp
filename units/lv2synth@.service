@@ -1,0 +1,12 @@
+[Unit]
+Description=Run a LV2 plugin as part of Jack connection graph lv2synth@%i.service
+Requires=pipersist@%i.in.service 
+After=pipersist@%i.in.service
+DefaultDependencies=No
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/environment.d/99-oslp.conf
+ExecStartPre=/usr/bin/test -f "$OSLP_JSON_PATH/%i.json"
+ExecStart=/usr/bin/runjalv "$OSLP_JSON_PATH" "%i.json"
+ExecStopPost=systemctl kill pipersist@%i.in.service

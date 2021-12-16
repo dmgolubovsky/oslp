@@ -110,7 +110,7 @@ instance ClientPortProvider PlugInst where
   getAutos (PlugInst Nothing _) = []
   getAutos (PlugInst (Just pd) inst) = [(inst, plugUri pd)]
   getRequires (PlugInst Nothing _) = []
-  getRequires (PlugInst (Just pd) inst) = ["synth@" ++ inst]
+  getRequires (PlugInst (Just pd) inst) = ["lv2synth@" ++ inst]
   getAudioPair (PlugInst Nothing _) _ = Nothing
   getAudioPair pi@(PlugInst (Just pd) _) tag = k pdl where
     pdl = case (tag "") of
@@ -219,4 +219,33 @@ breakOut (PlugInst (Just pd) inst) f = map x [1..] where
       audioInputPorts = map fst $ filter (f i) (zip (audioInputPorts pd) [1..]),
       audioOutputPorts = map fst $ filter (f i) (zip (audioOutputPorts pd) [1..])
     }
+
+{-
+
+AJ-Snapshot XML example
+
+<?xml version="1.0" encoding="utf-8"?>
+<aj-snapshot>
+<jack>
+  <client name="a2j">
+    <port name="A-PRO (capture): A-PRO 1">
+      <connection port="twosplit_k:midiin" />
+    </port>
+  </client>
+  <client name="twosplit_m">
+    <port name="lv2_midi_out_1">
+      <connection port="split_helm:lv2_events_in" />
+    </port>
+    <port name="lv2_midi_out_2">
+      <connection port="split_zyn:lv2_events_in" />
+    </port>
+  </client>
+</jack>
+</aj-snapshot>
+
+
+-}
+
+
+
 
