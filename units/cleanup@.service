@@ -1,0 +1,8 @@
+[Unit]
+Description=Cleanup dependencies after syngrp@%i finishes
+After=sgwait@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=-/bin/sh -c 'systemctl kill --signal=SIGINT `systemctl show syngrp@%i.service | grep ^Requires= | cut -d'=' -f 2`'
+

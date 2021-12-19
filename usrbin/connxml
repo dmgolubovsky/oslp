@@ -71,6 +71,7 @@ jq '.[].connect|select(. != null)' "$1/$2" | sed 's/[\{\}\,]//g' | grep -v '^$' 
     } || {
       vx=`echo -n "$v" | sed 's/^#//g'`
       wrxml "$k" "$vx"
+      wrxml "$vx" "$k"
     }
   }
 done

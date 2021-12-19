@@ -1,0 +1,13 @@
+[Unit]
+Description=Run aj-snapshot on behalf of syngrp@%i
+BindsTo=syngrp@%i.service
+Before=syngrp@%i.service
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/environment.d/99-oslp.conf
+ExecStartPre=/bin/sh -c '/usr/bin/connxml "$OSLP_JSON_PATH" "%i.json" | xmlstarlet fo > /tmp/%i.xml'
+ExecStart=/usr/bin/aj-snapshot -j -d "/tmp/%i.xml"
+ExecStopPost=/usr/bin/aj-snapshot -j -x
+
+

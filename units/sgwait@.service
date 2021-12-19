@@ -1,0 +1,8 @@
+[Unit]
+Description=Wait for syngrp@%i
+PartOf=syngrp@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sleep inf
+

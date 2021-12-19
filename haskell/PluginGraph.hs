@@ -199,7 +199,9 @@ genJSONMerge pg cs = top [descr, autos, requires, clnt, clss, connect] where
   listmap nl lsm = show nl ++ ": {" ++ intercalate ", " (map showmap lsm) ++ "}"
   showmap (k, v) = show k ++ ": " ++ show v
   autos = listmap "auto" $ nub $ concatMap getAutos pg
-  connect = listmap "connect" $ map mapsh $ nub $ concatMap getConnections pg
+  connpg = concatMap getConnections pg
+  connsw = map (\(a, b) -> (b, a)) connpg
+  connect = listmap "connect" $ map mapsh $ nub (connpg ++ connsw)
   mapsh (f, s) = (f, '#':s)
 
 
@@ -219,33 +221,6 @@ breakOut (PlugInst (Just pd) inst) f = map x [1..] where
       audioInputPorts = map fst $ filter (f i) (zip (audioInputPorts pd) [1..]),
       audioOutputPorts = map fst $ filter (f i) (zip (audioOutputPorts pd) [1..])
     }
-
-{-
-
-AJ-Snapshot XML example
-
-<?xml version="1.0" encoding="utf-8"?>
-<aj-snapshot>
-<jack>
-  <client name="a2j">
-    <port name="A-PRO (capture): A-PRO 1">
-      <connection port="twosplit_k:midiin" />
-    </port>
-  </client>
-  <client name="twosplit_m">
-    <port name="lv2_midi_out_1">
-      <connection port="split_helm:lv2_events_in" />
-    </port>
-    <port name="lv2_midi_out_2">
-      <connection port="split_zyn:lv2_events_in" />
-    </port>
-  </client>
-</jack>
-</aj-snapshot>
-
-
--}
-
 
 
 
