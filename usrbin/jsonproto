@@ -9,7 +9,7 @@
 # jsonproto uri client - both arguments are mandatory
 
 [ -z "$2" ] && {
-	echo "Usage: `basename $0` uri client" >&2
+	echo "Usage: `basename $0` uri client [settings...]" >&2
 	exit 1
 }
 
@@ -38,8 +38,19 @@ function inouts {
 
 ports=`inouts`
 
+stgs=""
+c3=""
+
+shift
+
+while shift ; do
+        [ ! -z "$1" ] && stgs=${stgs}${c3}\"$1\"
+        c3=", "
+done
+
+
 [ -z "$midi" -o -z "$audio" ] && c2="" || c2=", "
 
 echo '{' \""$client"\": '{' \"uri\": \""$uri"\", \"description\": $descr, \"client\": \""$client"\", \
-	$ports \"connect\": '{' "$midi" "$c2" "$audio" '} } }' | jq
+	\"settings\": [ $stgs ], $ports \"connect\": '{' "$midi" "$c2" "$audio" '} } }' | jq
 

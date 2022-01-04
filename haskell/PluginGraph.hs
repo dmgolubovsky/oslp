@@ -19,7 +19,7 @@ plugByUri s = M.lookup s plugUriMap
 
 -- Instantiate a named plugin client
 
-data PlugInst = PlugInst (Maybe PluginDef) String deriving (Show, Eq)
+data PlugInst = PlugInst (Maybe PluginDef) String [String] deriving (Show, Eq)
 
 -- Client port representing both instance and its port. Can be used for both plugin and hardware ports.
 -- In the latter case plugin instance is Nothing
@@ -30,7 +30,7 @@ data ClientPort = ClientPort (Maybe PlugInst) PluginPort
 clientPortName :: ClientPort -> String
 
 clientPortName (ClientPort Nothing pp) = portName pp
-clientPortName (ClientPort (Just (PlugInst _ s)) pp) = s ++ ":" ++ (portName pp)
+clientPortName (ClientPort (Just (PlugInst _ s _)) pp) = s ++ ":" ++ (portName pp)
 
 -- A hardware group of Audio or MIDI ports. Port names are just entered directly.
 
@@ -63,6 +63,8 @@ class ClientPortProvider c where
   getConnections _ = []
   getAudioPair :: c -> (String -> PluginPort) -> Maybe (ClientPort, ClientPort)
   getAudioPair _ _ = Nothing
+  getSettings :: c -> [(String, [String])]
+  getSettings _ = []
 
 -- A Hardware group of ports only returns its ports but no plugins to instantiate.
 
@@ -98,8 +100,8 @@ instance ClientPortProvider ClientPort where
 -- getAudioPair returns the first two audio ports available, or one port twice.
 
 instance ClientPortProvider PlugInst where
-  getClientPort (PlugInst Nothing _) _ = Nothing
-  getClientPort pi@(PlugInst (Just pd) _) tag = k pdl where
+  getClientPort (PlugInst Nothing _ _) _ = Nothing
+  getClientPort pi@(PlugInst (Just pd) _ _) tag = k pdl where
     pdl = case (tag "") of
       MidiInputPort "" -> midiInputPorts pd
       MidiOutputPort "" -> midiOutputPorts pd
@@ -107,12 +109,12 @@ instance ClientPortProvider PlugInst where
       AudioOutputPort "" -> audioOutputPorts pd
     k [] = Nothing
     k (p:ps) = Just $ ClientPort (Just pi) p
-  getAutos (PlugInst Nothing _) = []
-  getAutos (PlugInst (Just pd) inst) = [(inst, plugUri pd)]
-  getRequires (PlugInst Nothing _) = []
-  getRequires (PlugInst (Just pd) inst) = ["lv2synth@" ++ inst]
-  getAudioPair (PlugInst Nothing _) _ = Nothing
-  getAudioPair pi@(PlugInst (Just pd) _) tag = k pdl where
+  getAutos (PlugInst Nothing _ _) = []
+  getAutos (PlugInst (Just pd) inst _) = [(inst, plugUri pd)]
+  getRequires (PlugInst Nothing _ _) = []
+  getRequires (PlugInst (Just pd) inst _) = ["lv2synth@" ++ inst]
+  getAudioPair (PlugInst Nothing _ _) _ = Nothing
+  getAudioPair pi@(PlugInst (Just pd) _ _) tag = k pdl where
     pdl = case (tag "") of
       MidiInputPort "" -> []
       MidiOutputPort "" -> []
@@ -121,6 +123,7 @@ instance ClientPortProvider PlugInst where
     k [] = Nothing
     k [p1] = Just $ (ClientPort (Just pi) p1, ClientPort (Just pi) p1)
     k [p1, p2] = Just $ (ClientPort (Just pi) p1, ClientPort (Just pi) p2)
+  getSettings (PlugInst _ inst stgs) = [(inst, stgs)]
 
 -- Plugin group: a composition of multiple plugins, usually built piece by piece
 -- It features MIDI input/output ports, and audio input/output pairs, whatever available.
@@ -132,7 +135,8 @@ data PluginGroup = PluginGroup {
   pgMidiInput :: Maybe ClientPort,
   pgMidiOutput :: Maybe ClientPort,
   pgInputAudioPair :: Maybe (ClientPort, ClientPort),
-  pgOutputAudioPair :: Maybe (ClientPort, ClientPort)
+  pgOutputAudioPair :: Maybe (ClientPort, ClientPort),
+  pgSettings :: [(String, [String])]
 } deriving (Eq)
 
 instance ClientPortProvider PluginGroup where
@@ -147,6 +151,7 @@ instance ClientPortProvider PluginGroup where
   getAutos = pgAutos
   getRequires = pgRequires
   getConnections = pgConnections
+  getSettings = pgSettings
   getAudioPair pg tag = pdl where
     pdl = case (tag "") of
       MidiInputPort "" -> Nothing
@@ -165,7 +170,8 @@ ser src dst = PluginGroup {
   pgOutputAudioPair = getAudioPair dst AudioOutputPort,
   pgConnections = midicon ++ audiocon ++ getConnections src ++ getConnections dst,
   pgRequires = getRequires src ++ getRequires dst,
-  pgAutos = getAutos src ++ getAutos dst
+  pgAutos = getAutos src ++ getAutos dst,
+  pgSettings = nub (getSettings src ++ getSettings dst)
 } where
     midicon = k cp1 cp2
     cp1 = getClientPort src MidiOutputPort
@@ -188,14 +194,14 @@ genJSON ps = genJSONMerge [ps]
 
 genJSONMerge :: [PluginGroup] -> String -> String
 
-genJSONMerge pg cs = top [descr, autos, requires, clnt, clss, connect] where
+genJSONMerge pg cs = top [descr, autos, requires, clnt, clss, connect, settings] where
   top ss = "{" ++ show cs ++ ": {" ++ intercalate ", " ss ++ "} }"
   pair a b = show a ++ ": " ++ show b
   descr = pair "description" cs
   clnt = pair "client" cs
   clss = pair "class" "syngrp"
   list nl ls = show nl ++ ": [" ++ intercalate ", " (map show ls) ++ "]"
-  requires = list "requires" (nub$ concatMap getRequires pg)
+  requires = list "requires" (nub $ concatMap getRequires pg)
   listmap nl lsm = show nl ++ ": {" ++ intercalate ", " (map showmap lsm) ++ "}"
   showmap (k, v) = show k ++ ": " ++ show v
   autos = listmap "auto" $ nub $ concatMap getAutos pg
@@ -203,6 +209,7 @@ genJSONMerge pg cs = top [descr, autos, requires, clnt, clss, connect] where
   connsw = map (\(a, b) -> (b, a)) connpg
   connect = listmap "connect" $ map mapsh $ nub (connpg ++ connsw)
   mapsh (f, s) = (f, '#':s)
+  settings = listmap "settings" $ nub $ concatMap getSettings pg
 
 
 -- Breakout a plugin instance into multiple instances. May be useful with multichannel inputs or outputs.
@@ -211,10 +218,10 @@ genJSONMerge pg cs = top [descr, autos, requires, clnt, clss, connect] where
 
 breakOut :: PlugInst -> (Int -> (PluginPort, Int) -> Bool) -> [PlugInst]
 
-breakOut pi@(PlugInst Nothing _) _ = repeat pi
+breakOut pi@(PlugInst Nothing _ _) _ = repeat pi
 
-breakOut (PlugInst (Just pd) inst) f = map x [1..] where
-  x i = PlugInst (Just pd') inst where
+breakOut (PlugInst (Just pd) inst stgs) f = map x [1..] where
+  x i = PlugInst (Just pd') inst stgs where
     pd' = pd {
       midiInputPorts = map fst $ filter (f i) (zip (midiInputPorts pd) [1..]),
       midiOutputPorts = map fst $ filter (f i) (zip (midiOutputPorts pd) [1..]),
