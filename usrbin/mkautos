@@ -13,7 +13,8 @@
 jq '.[].auto|select(. != null)' "$1/$2" | sed 's/: /@/g' | tr -d '{}" ,' | grep -v '^$' | while read kv ; do
 	k=`echo "$kv" | cut -d'@' -f 1`
 	v=`echo "$kv" | cut -d'@' -f 2`
-	jsonproto "$v" "$k" > "$1/${k}.json"
+	s=`jq -r ".[].settings.${k}|.[]" "$1/$2"`
+	jsonproto "$v" "$k" $s > "$1/${k}.json"
 done
 
 
