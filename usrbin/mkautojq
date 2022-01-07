@@ -1,0 +1,35 @@
+#! /bin/bash 
+
+# $1: JSON directory
+# $2: JSON file to process
+
+[ -z "$1" ] && exit
+
+# Process the "auto" section of the json file, if any.
+# The section contains mappings of synth instance names as keys and URIs as values
+# For each mapping jsonproto will be called to create a JSON descriptor to become
+# part of the syngroup on behalf of which it is created.
+
+# jqproto client syngroupfile
+
+function jqproto {
+  clnt="$1"
+  sygf="$2"
+  jq  ".[].auto.${clnt} as \$uri |
+       .[].settings.${clnt} as \$settings | {
+             ${clnt}:{
+                 uri: \$uri,
+  	         client: \"${clnt}\",
+	         settings: \$settings,
+	         connect: {}
+	    }
+       }" "$2"
+}
+
+jq '.[].auto|select(. != null)' "$1/$2" | sed 's/: /@/g' | tr -d '{}" ,' | grep -v '^$' | while read kv ; do
+	k=`echo "$kv" | cut -d'@' -f 1`
+	v=`echo "$kv" | cut -d'@' -f 2`
+	jqproto "$k" "$1/$2" > "$1/${k}.json"
+done
+
+

@@ -4,6 +4,6 @@ Description=Make dependent prototypes on behalf of syngrp@%i
 [Service]
 Type=oneshot
 EnvironmentFile=/etc/environment.d/99-oslp.conf
-ExecStart=/usr/bin/mkautos "$OSLP_JSON_PATH" %i.json
+ExecStart=/usr/bin/mkautojq "$OSLP_JSON_PATH" %i.json
 
 

@@ -1,0 +1,57 @@
+{
+  "xxxx": {
+    "description": "xxxx",
+    "auto": {
+      "twosplit_k": "http://gareus.org/oss/lv2/midifilter#keysplit",
+      "twosplit_m": "http://kxstudio.sf.net/carla/plugins/midisplit",
+      "split_helm": "http://tytel.org/helm",
+      "split_zyn": "http://zynaddsubfx.sourceforge.net",
+      "transp": "http://gareus.org/oss/lv2/midifilter#miditranspose",
+      "pad_zyn": "http://zynaddsubfx.sourceforge.net",
+      "seq": "http://gareus.org/oss/lv2/stepseq#s8n8"
+    },
+    "requires": [
+      "lv2synth@twosplit_k",
+      "lv2synth@twosplit_m",
+      "lv2synth@split_helm",
+      "lv2synth@split_zyn",
+      "lv2synth@transp",
+      "lv2synth@pad_zyn",
+      "lv2synth@seq"
+    ],
+    "client": "xxxx",
+    "class": "syngrp",
+    "connect": {
+      "twosplit_k:midiout": "#twosplit_m:lv2_midi_in",
+      "a2j:A-PRO (capture): A-PRO 1": "#twosplit_k:midiin",
+      "split_helm:lv2_audio_out_1": "#system:playback_1",
+      "split_helm:lv2_audio_out_2": "#system:playback_2",
+      "twosplit_m:lv2_midi_out_1": "#transp:midiin",
+      "split_zyn:lv2_audio_out_1": "#system:playback_1",
+      "split_zyn:lv2_audio_out_2": "#system:playback_2",
+      "twosplit_m:lv2_midi_out_2": "#pad_zyn:lv2_events_in",
+      "pad_zyn:lv2_audio_out_1": "#system:playback_1",
+      "pad_zyn:lv2_audio_out_2": "#system:playback_2",
+      "transp:midiout": "#pad_zyn:lv2_events_in",
+      "twosplit_m:lv2_midi_in": "#twosplit_k:midiout",
+      "twosplit_k:midiin": "#a2j:A-PRO (capture): A-PRO 1",
+      "system:playback_1": "#pad_zyn:lv2_audio_out_1",
+      "system:playback_2": "#pad_zyn:lv2_audio_out_2",
+      "split_helm:lv2_events_in": "#twosplit_m:lv2_midi_out_1",
+      "split_zyn:lv2_events_in": "#twosplit_m:lv2_midi_out_2",
+      "pad_zyn:lv2_events_in": "#twosplit_m:lv2_midi_out_2",
+      "transp:midiin": "#twosplit_m:lv2_midi_out_1"
+    },
+    "settings": {
+      "twosplit_k": [
+        "split=46"
+      ],
+      "twosplit_m": [],
+      "split_helm": [],
+      "split_zyn": [],
+      "transp": [],
+      "pad_zyn": [],
+      "seq": []
+    }
+  }
+}
