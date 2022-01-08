@@ -4,7 +4,8 @@
     "description": "MIDI Keysplit",
     "client": "twosplit_k",
     "settings": [
-      "split=46"
+      "split=46",
+      "foo=bar"
     ],
     "midiin": "twosplit_k:midiin",
     "midiout": "twosplit_k:midiout",
