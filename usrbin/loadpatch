@@ -1,0 +1,25 @@
+#! /bin/bash
+
+# Load a patch based on a JSON file received on standard input.
+
+patch=`jq . /dev/stdin`
+
+client=`jq -r '.[].client' <<< "$patch"`
+class=`jq -r '.[].class' <<< "$patch"`
+
+cat <<< "$patch" > ${OSLP_JSON_PATH}/${client}.json
+
+for t in `seq 1 10` ; do
+  nreqjs=`jq -r '.[].requires[]' <<< "$patch" | wc -l`
+  nreqsym=`ls -1 "/etc/systemd/system/${class}@${client}.service.requires/" | wc -l`
+  [ "$nreqjs" = "$nreqsym" ] && {
+    systemctl start "${class}@${client}.service"
+    echo "${class}@${client}.service"
+    exit
+  }
+  sleep 1
+done
+
+echo "not all dependencies have been formed" >> /dev/stderr
+exit 1
+
