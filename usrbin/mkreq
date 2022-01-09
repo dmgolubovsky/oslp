@@ -11,7 +11,7 @@
 [ -z "$1" ] && exit
 
 for j in "$1"/*.json ; do
-	mkautos "$1" `basename "$j"`
+	mkautojq "$1" `basename "$j"`
 done
 
 jq '.[][]|. as $parent | .requires as $req | select($req != null) | ($parent.class+"@"+$parent.client)' --slurp "$1"/*.json | while read par ; do
