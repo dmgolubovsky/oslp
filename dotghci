@@ -1,0 +1,6 @@
+-- The .ghci file for OSLP
+
+-- Path to the OSLP Haskell modules
+
+:set -i/usr/lib/oslp/haskell
+

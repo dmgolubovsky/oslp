@@ -1,0 +1,13 @@
+#! /bin/bash
+
+# Unload a patch referred to by a JSON file received on standard input.
+
+patch=`jq . /dev/stdin`
+
+client=`jq -r '.[].client' <<< "$patch"`
+class=`jq -r '.[].class' <<< "$patch"`
+
+systemctl stop "${class}@${client}.service"
+
+
+

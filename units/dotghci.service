@@ -1,0 +1,12 @@
+[Unit]
+Description=Symlink the provided dotghci file to the root home directory
+
+[Service]
+ConditionPathIsSymbolicLink=!/root/.ghci
+Type=oneshot
+User=root
+ExecStart=/bin/ln -sf /usr/lib/oslp/haskell/dotghci /root/.ghci
+ExecStart=/usr/bin/chmod go-w /root/.ghci
+
+[Install]
+WantedBy=basic.target

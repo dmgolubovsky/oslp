@@ -107,7 +107,7 @@ run rm -rf /install-kx
 run env DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends jackd2 a2jmidid alsa-utils \
         amsynth zynaddsubfx lilv-utils aj-snapshot helm python3 jq x11-utils x42-plugins carla \
 	xterm xinit psmisc dbus-x11 locales gmrun liblilv-0-0 libsratom-0-0 libserd-0-0 libsuil-0-0 libgtk-3-0 \
-	wmctrl zenity xdotool hugs xmlstarlet libxml2-utils
+	wmctrl zenity xdotool ghc xmlstarlet libxml2-utils lsp-plugins
 
 run update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
@@ -117,7 +117,7 @@ add units /lib/systemd/system
 run mkdir -p /usr/lib/oslp/json
 add json /usr/lib/oslp/json
 
-run systemctl enable jackd.service a2jmidid.service conlog.service makereq.service makereq.path
+run systemctl enable jackd.service a2jmidid.service conlog.service makereq.service makereq.path dotghci.service
 run systemctl disable systemd-resolved.service
 run systemctl disable networkd-dispatcher.service
 run systemctl disable console-getty.service
@@ -154,10 +154,11 @@ run mkdir -p /usr/lib/oslp/haskell
 run /usr/bin/mkhslib >/usr/lib/oslp/haskell/PluginBase.hs
 
 add haskell /usr/lib/oslp/haskell
+add dotghci /usr/lib/oslp/haskell
 
 workdir /usr/lib/oslp/haskell
 
-run for f in *.hs; do echo :q | hugs $f | egrep '(^ERROR|^\*\*\*)' | tee /dev/stderr | grep ^ERROR | wc -l | (read n ;exit $n) ; done
+run for f in *.hs; do echo :q | ghci $f 2>&1 | tee /dev/stderr | grep 'error:$' | wc -l | (read n; exit $n) ; done
 
 # Install yq
 

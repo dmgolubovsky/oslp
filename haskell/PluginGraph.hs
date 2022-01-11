@@ -186,8 +186,6 @@ ser src dst = PluginGroup {
 
 -- Generate JSON for a PluginGroup providing a name for systemd service
 
-intercalate xs xss = (concat (intersperse xs xss))
-
 genJSON :: PluginGroup -> String -> String
 
 genJSON ps = genJSONMerge [ps]

@@ -14,7 +14,6 @@ for t in `seq 1 10` ; do
   nreqsym=`ls -1 "/etc/systemd/system/${class}@${client}.service.requires/" | wc -l`
   [ "$nreqjs" = "$nreqsym" ] && {
     systemctl start "${class}@${client}.service"
-    echo "${class}@${client}.service"
     exit
   }
   sleep 1
