@@ -12,6 +12,7 @@ services:
                         - /etc/timezone:/etc/timezone:ro
                         - $XAUTHORITY:/root/.Xauthority:ro
                         - oslp_home:/root:rw
+                        - hyd_drumkits:/usr/share/hydrogen/data/drumkits:ro
                         - ${OSLPCONF:-/dev/null}:/etc/environment.d/99-oslp.conf:ro
                         - ${OSLPCONF:-/dev/null}:/etc/bash.bashrc:ro
                 environment:
@@ -34,5 +35,7 @@ services:
 volumes:
         oslp_home:
 
-
+        hyd_drumkits:
+                external: true
+                name: hyd_drumkits
 

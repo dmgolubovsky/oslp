@@ -2,6 +2,10 @@ module PluginGraph where
 
 import PluginBase
 
+import System.Process
+import System.Exit
+import System.IO
+
 import qualified Data.Map as M
 import Data.List
 
@@ -25,7 +29,7 @@ data PlugInst = PlugInst (Maybe PluginDef) String [String] deriving (Show, Eq)
 -- In the latter case plugin instance is Nothing
 
 data ClientPort = ClientPort (Maybe PlugInst) PluginPort
-  deriving (Eq)
+  deriving (Eq, Show)
 
 clientPortName :: ClientPort -> String
 
@@ -137,7 +141,7 @@ data PluginGroup = PluginGroup {
   pgInputAudioPair :: Maybe (ClientPort, ClientPort),
   pgOutputAudioPair :: Maybe (ClientPort, ClientPort),
   pgSettings :: [(String, [String])]
-} deriving (Eq)
+} deriving (Eq, Show)
 
 instance ClientPortProvider PluginGroup where
   getClientPort pg tag = k pdl where
@@ -208,6 +212,32 @@ genJSONMerge pg cs = top [descr, autos, requires, clnt, clss, connect, settings]
   connect = listmap "connect" $ map mapsh $ nub (connpg ++ connsw)
   mapsh (f, s) = (f, '#':s)
   settings = listmap "settings" $ nub $ concatMap getSettings pg
+
+-- Useful utilities for (un)loading patches from ghci
+
+genJSONMergeM :: [PluginGroup] -> String -> IO String
+
+genJSONMergeM pg cs = return $ genJSONMerge pg cs
+
+-- General processing of JSON generated from a Plugin Group
+
+procJSON :: String -> String -> IO ExitCode
+
+procJSON pgm js = do
+  (mb_hstdin, _, _, ph) <- createProcess (proc pgm []) { std_in = CreatePipe }
+  case mb_hstdin of
+    Nothing -> return $ ExitFailure 1
+    Just hstdin -> do
+      hPutStrLn hstdin js
+      hFlush hstdin
+      waitForProcess ph
+
+
+
+loadPatch = procJSON "/usr/bin/loadpatch"
+
+unLoadPatch = procJSON "/usr/bin/unloadpatch"
+
 
 
 -- Breakout a plugin instance into multiple instances. May be useful with multichannel inputs or outputs.
