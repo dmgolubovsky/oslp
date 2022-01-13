@@ -8,6 +8,6 @@ client=`jq -r '.[].client' <<< "$patch"`
 class=`jq -r '.[].class' <<< "$patch"`
 
 systemctl stop "${class}@${client}.service"
-
+rm -f /etc/systemd/system/${class}@${client}.service.requires/*
 
 
