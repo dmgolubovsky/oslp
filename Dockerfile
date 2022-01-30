@@ -13,6 +13,21 @@ from base-ubuntu as builder
 
 run apt -y install build-essential git make wget
 
+# Build B-sequencer
+
+from builder as bseq
+
+run apt -y install pkg-config libx11-dev libcairo2-dev lv2-dev
+
+run git clone https://github.com/sjaehn/BSEQuencer.git
+
+workdir BSEQuencer
+
+run git checkout 1.8.10
+
+run make
+run make install
+
 # JALV
 
 from builder as jalv
@@ -107,7 +122,7 @@ run rm -rf /install-kx
 run env DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends jackd2 a2jmidid alsa-utils \
         amsynth zynaddsubfx lilv-utils aj-snapshot helm python3 jq x11-utils x42-plugins carla \
 	xterm xinit psmisc dbus-x11 locales gmrun liblilv-0-0 libsratom-0-0 libserd-0-0 libsuil-0-0 libgtk-3-0 \
-	wmctrl zenity xdotool ghc xmlstarlet libxml2-utils lsp-plugins bjumblr bsequencer
+	wmctrl zenity xdotool ghc xmlstarlet libxml2-utils lsp-plugins bjumblr 
 
 run update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
@@ -142,6 +157,8 @@ copy --from=lilvpy /usr/lib/python3/dist-packages/lilv.py /usr/lib/python3/dist-
 run mkdir -p /usr/lib/lv2/stereo-mixer.lv2
 
 copy --from=lilvpy /lv2-stereo-mixer/stereo-mixer.lv2 /usr/lib/lv2/stereo-mixer.lv2
+
+copy --from=bseq /usr/local/lib/lv2 /usr/lib/lv2
 
 # Symlink lv2 from incorrect install locations
 
